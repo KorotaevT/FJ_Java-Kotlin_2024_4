@@ -1,11 +1,14 @@
 import formatting.newsPrinter
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 import service.NewsService
 import util.getMostRatedNews
 
 fun main() = runBlocking {
     val newsService = NewsService()
+
+    val logger = LoggerFactory.getLogger(this.javaClass)
 
     val newsList = newsService.fetchNews(100)
     val mostRatedNews = newsList.getMostRatedNews(
@@ -23,7 +26,7 @@ fun main() = runBlocking {
         }
     }
 
-    println(output.build())
+    logger.info("Generated HTML content:\n${output.build()}")
 
     output.saveToFile("news.html".toNewsResourcePath())
 }
