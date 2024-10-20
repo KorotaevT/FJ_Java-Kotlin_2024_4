@@ -24,6 +24,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
     implementation("ch.qos.logback:logback-core:1.5.7")
     implementation("ch.qos.logback:logback-classic:1.5.7")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    testImplementation("io.ktor:ktor-client-mock:2.1.3")
 }
 
 tasks.withType<Test> {
