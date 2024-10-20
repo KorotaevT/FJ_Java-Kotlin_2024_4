@@ -1,5 +1,6 @@
 import dto.NewsDTO
 import formatting.newsPrinter
+import io.ktor.client.engine.cio.CIO
 import java.time.LocalDate
 import kotlin.time.Duration
 import kotlin.time.measureTimedValue
@@ -9,7 +10,7 @@ import org.slf4j.LoggerFactory
 import service.NewsService
 
 fun main() = runBlocking {
-    val newsService = NewsService()
+    val newsService = NewsService(CIO.create())
 
     val logger = LoggerFactory.getLogger(this.javaClass)
 
