@@ -1,22 +1,29 @@
+import dto.NewsDTO
 import formatting.newsPrinter
 import java.time.LocalDate
+import kotlin.time.Duration
+import kotlin.time.measureTimedValue
 import kotlinx.coroutines.runBlocking
+import util.getMostRatedNews
 import org.slf4j.LoggerFactory
 import service.NewsService
-import util.getMostRatedNews
 
 fun main() = runBlocking {
     val newsService = NewsService()
 
     val logger = LoggerFactory.getLogger(this.javaClass)
 
-    val newsList = newsService.fetchNews(100)
-    val mostRatedNews = newsList.getMostRatedNews(
-        10,
-        LocalDate.of(2024, 1, 1)..LocalDate.of(2024, 12, 31)
-    )
+    val (mostRatedNews: List<NewsDTO>, duration: Duration) = measureTimedValue {
+        val newsList = newsService.fetchNews(count = 100)
 
-    newsService.saveNewsToCsv("news.csv".toNewsResourcePath(), mostRatedNews)
+        val mostRatedNews = newsList.getMostRatedNews(
+            10,
+            LocalDate.of(2024, 1, 1)..LocalDate.of(2024, 12, 31)
+        )
+        newsService.saveNews("news.csv".toNewsResourcePath(), mostRatedNews)
+
+        mostRatedNews
+    }
 
     val output = newsPrinter {
         addHeader(level = 1) { append("Most Rated News") }
@@ -26,9 +33,17 @@ fun main() = runBlocking {
         }
     }
 
-    logger.info("Generated HTML content:\n${output.build()}")
+    logger.info(output.build())
 
-    output.saveToFile("news.html".toNewsResourcePath())
+    output.saveToFile("news.md".toNewsResourcePath())
+
+    logger.info("The process of saving news before parallelization was performed ${duration.inWholeNanoseconds} in nanoseconds.")
+
+    val duration2 = measureTimedValue {
+        newsService.getNewsAndSaveThemUsingCoroutines(path = "news2.csv".toNewsResourcePath())
+    }
+
+    logger.info("The process of saving news after parallelization was performed ${duration2.duration.inWholeNanoseconds} in nanoseconds.")
 }
 
 private fun String.toNewsResourcePath() =
